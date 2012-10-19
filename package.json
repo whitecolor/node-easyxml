@@ -1,0 +1,24 @@
+{
+    "name": "easyxml",
+    "preferGlobal": false,
+    "version": "0.0.1",
+    "author": "Thomas Hunter <tlhunter@gmail.com>",
+    "description": "A configurable object to XML converter",
+    "contributors": [
+        {
+            "name": "Thomas Hunter",
+            "email": "tlhunter@gmail.com"
+        }
+    ],
+    "dependencies": {
+        "elementtree": "",
+        "inflector": ""
+    },
+    "license": "Dual BSD/GPL",
+    "engines": {
+        "node": ">= 0.8"
+    },
+    "keywords": [
+        "xml"
+    ]
+}
