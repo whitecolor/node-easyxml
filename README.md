@@ -8,11 +8,6 @@ since a lot of different people have different expectations.
 Everything in here is CPU bound and without callbacks, so feel free to run
 it synchronously.
 
-Installation
-=
-
-    npm install easyxml
-
 Config
 =
 
