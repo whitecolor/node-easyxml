@@ -1,5 +1,4 @@
-Easy XML
-=
+## Easy XML
 
 The purpose of this module is to provide an easy to use function for
 converting your JS objects into XML. I plan on making it configurable
@@ -8,8 +7,11 @@ since a lot of different people have different expectations.
 Everything in here is CPU bound and without callbacks, so feel free to run
 it synchronously.
 
-Config
-=
+## Installation
+
+    $ npm install easyxml
+
+## Config
 
 * singularizeChildren: If an array is plural, its children elements will be singular
 * underscoreAttributes: String attributes starting with _ will be XML attributes
@@ -18,8 +20,7 @@ Config
 * indent: A number representing the spaces to indent children, use 0 for no whitespace
 * manifest: Whether or not to add that XML manifest line to the top
 
-Purpose
-=
+## Purpose
 
 I was working on a Node.js API, and I wanted to be able to build a single
 object within each of my actions, and have that object automatically
@@ -30,8 +31,7 @@ bunch of sub elements with the singular version of the name. This library
 allows for all of that. Can be configured globally as well as on a per
 usage basis.
 
-Example
-=
+## Example
 
 Input Object:
 
@@ -84,7 +84,6 @@ Output XML:
       <nullz />
     </response>
 
-License
-=
+## License
 
 This project is licensed under the MIT license.
