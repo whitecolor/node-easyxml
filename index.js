@@ -86,7 +86,7 @@ var EasyXml = function() {
                     if (typeof child === 'string' || typeof child === 'number') {
                         parentXmlNode.set(key.substring(1), child);
                     } else {
-                        throw new Error("non_string_attribute");
+                        throw new Error(key + "contained non_string_attribute");
                     }
                 } else if (child === null) {
                     // Null data, send an empty tag
@@ -111,7 +111,7 @@ var EasyXml = function() {
                         // JavaScript date format
                         el.text = child.toString();
                     } else {
-                        throw new Error("unknown_date_format");
+                        throw new Error(key + "contained unknown_date_format");
                     }
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Array') {
                     // Array
@@ -140,7 +140,7 @@ var EasyXml = function() {
                     el = subElement(parentXmlNode, key);
                     el.text = child.toString();
                 } else {
-                    throw new Error("unknown_data_type");
+                    throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
             }
         }
