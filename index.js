@@ -123,6 +123,7 @@ var EasyXml = function() {
                             var el2 = subElement(el, subElementName);
                             parseChildElement(el2, child[key2]);
                         } else {
+                            // Just add element directly without parsing
                             var el2 = subElement(el, subElementName);
                             el2.text = child[key2].toString();
                         }
