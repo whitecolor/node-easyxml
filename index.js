@@ -118,9 +118,13 @@ var EasyXml = function() {
                     el = subElement(parentXmlNode, key);
                     var subElementName = key.singular();
                     for (var key2 in child) {
-                        if (child.hasOwnProperty(key2)) {
+                        // Check type of child element
+                        if (child.hasOwnProperty(key2) && typeof child[key2] === 'object') {
                             var el2 = subElement(el, subElementName);
                             parseChildElement(el2, child[key2]);
+                        } else {
+                            var el2 = subElement(el, subElementName);
+                            el2.text = child[key2].toString();
                         }
                     }
                 } else if (typeof child === 'object') {
