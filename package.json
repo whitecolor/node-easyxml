@@ -12,11 +12,19 @@
         {
             "name": "Thomas Hunter",
             "email": "tlhunter@gmail.com"
+        },
+        {
+            "name": "Joshua Kalis",
+            "email": "JoshKalis@QuickenLoans.com"
         }
     ],
     "dependencies": {
-        "elementtree": "",
-        "inflector": ""
+        "elementtree": "0.1.5",
+        "inflector": "0.0.1"
+    },
+    "devDependencies": {
+        "chai": "1.4.2",
+        "mocha": "1.8.1"
     },
     "license": "Dual BSD/GPL",
     "engines": {
