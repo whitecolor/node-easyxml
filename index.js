@@ -41,6 +41,7 @@ var EasyXml = function() {
     self.config = {
         singularizeChildren: true,
         underscoreAttributes: true,
+        underscoreChar: '_',
         rootElement: 'response',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
@@ -81,10 +82,13 @@ var EasyXml = function() {
                 var child = parentObjectNode[key];
                 var el = null;
 
-                if (self.config.underscoreAttributes && key.charAt(0) === '_') {
+                if (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar) {
                     // Attribute
                     if (typeof child === 'string' || typeof child === 'number') {
-                        parentXmlNode.set(key.substring(1), child);
+                        if(key === self.config.underscoreChar)
+                          parentXmlNode.text=child;
+                        else
+                          parentXmlNode.set(key.substring(1), child);
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
