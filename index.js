@@ -148,6 +148,9 @@ var EasyXml = function() {
                     // It's a true or a false
                     el = subElement(parentXmlNode, key);
                     el.text = child.toString();
+                } else if (typeof child === 'undefined') {
+                    // It's undefined
+                    el = subElement(parentXmlNode, key);
                 } else {
                     throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
