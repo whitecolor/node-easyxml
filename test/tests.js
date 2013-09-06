@@ -7,15 +7,6 @@ var assert  = require("chai").assert,
 
     easyXML = require("../index.js");
 
-var DEFAULT_OPTIONS = {
-            singularizeChildren: true,
-            underscoreAttributes: true,
-            rootElement: 'response',
-            dateFormat: 'ISO',
-            indent: 2,
-            manifest: true
-        };
-
 describe("Node EasyXML", function () {
   var should = {
         "names"  : "should parse a JSON object into XML",
