@@ -82,7 +82,18 @@ var EasyXml = function() {
                 var child = parentObjectNode[key];
                 var el = null;
 
-                if (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar) {
+                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+                    el = subElement(parentXmlNode, key);
+                    for (var key in child) {
+                        if (typeof child[key] === 'object') {
+                            parseChildElement(el, child[key]);
+                        } else {
+                            el = subElement(el, key);
+                            el.text = child[key].toString();
+                        }
+                    }
+                    // parseChildElement(, child);
+                } else if (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar) {
                     // Attribute
                     if (typeof child === 'string' || typeof child === 'number') {
                         if(key === self.config.underscoreChar)
