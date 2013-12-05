@@ -20,7 +20,7 @@
     ],
     "dependencies": {
         "elementtree": "0.1.5",
-        "inflector": "0.0.1"
+        "inflect": "0.3.x"
     },
     "devDependencies": {
         "chai": "1.4.2",

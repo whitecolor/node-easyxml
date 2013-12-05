@@ -1,9 +1,8 @@
-require("inflector"); // modifies global string object
-
 var et = require('elementtree');
 var ElementTree = et.ElementTree;
 var element = et.Element;
 var subElement = et.SubElement;
+var inflect = require('inflect');
 
 /**
  * This function merges two objects. Pretty simple stuff.
@@ -131,7 +130,8 @@ var EasyXml = function() {
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Array') {
                     // Array
                     el = subElement(parentXmlNode, key);
-                    var subElementName = key.singular();
+                    var subElementName = inflect.singularize(key);
+
                     for (var key2 in child) {
                         // Check type of child element
                         if (child.hasOwnProperty(key2) && typeof child[key2] === 'object') {
