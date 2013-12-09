@@ -148,19 +148,15 @@ var EasyXml = function() {
                     el = subElement(parentXmlNode, key);
                     parseChildElement(el, child);
                 } else if (typeof child === 'number') {
-                    // It's a number
                     el = subElement(parentXmlNode, key);
                     el.text = child.toString();
                 } else if (typeof child === 'string') {
-                    // It's a string
                     el = subElement(parentXmlNode, key);
                     el.text = child;
                 } else if (typeof child === 'boolean') {
-                    // It's a true or a false
                     el = subElement(parentXmlNode, key);
                     el.text = child.toString();
                 } else if (typeof child === 'undefined') {
-                    // It's undefined
                     el = subElement(parentXmlNode, key);
                 } else {
                     throw new Error(key + " contained unknown_data_type: " + typeof child);
