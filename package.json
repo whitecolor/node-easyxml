@@ -1,7 +1,7 @@
 {
     "name": "easyxml",
     "preferGlobal": false,
-    "version": "0.0.3",
+    "version": "0.0.4",
     "author": "Thomas Hunter <tlhunter@gmail.com>",
     "description": "A configurable object to XML converter",
     "repository": {
