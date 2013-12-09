@@ -147,15 +147,12 @@ var EasyXml = function() {
                     // Object, go deeper
                     el = subElement(parentXmlNode, key);
                     parseChildElement(el, child);
-                } else if (typeof child === 'number') {
+                } else if (typeof child === 'number' || typeof child === 'boolean') {
                     el = subElement(parentXmlNode, key);
                     el.text = child.toString();
                 } else if (typeof child === 'string') {
                     el = subElement(parentXmlNode, key);
                     el.text = child;
-                } else if (typeof child === 'boolean') {
-                    el = subElement(parentXmlNode, key);
-                    el.text = child.toString();
                 } else if (typeof child === 'undefined') {
                     el = subElement(parentXmlNode, key);
                 } else {
