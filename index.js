@@ -96,9 +96,7 @@ var EasyXml = function() {
                             el.text = child[key].toString();
                         }
                     }
-                    // parseChildElement(, child);
                 } else if (isAttribute(self)) {
-                    // Attribute
                     if (typeof child === 'string' || typeof child === 'number') {
                         if(key === self.config.underscoreChar)
                           parentXmlNode.text=child;
