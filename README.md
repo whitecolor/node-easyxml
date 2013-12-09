@@ -58,7 +58,7 @@ Example Config:
         singularizeChildren: true,
         underscoreAttributes: true,
         rootElement: 'response',
-        dateFormat: 'ISO',
+        dateFormat: 'ISO', // JS, SQL
         indent: 2,
         manifest: true
     }

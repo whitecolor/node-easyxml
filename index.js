@@ -1,9 +1,8 @@
-require("inflector"); // modifies global string object
-
-var et = require('elementtree');
-var ElementTree = et.ElementTree;
-var element = et.Element;
-var subElement = et.SubElement;
+var et = require('elementtree'),
+    inflect = require('inflect'),
+    ElementTree = et.ElementTree,
+    element = et.Element,
+    subElement = et.SubElement;
 
 /**
  * This function merges two objects. Pretty simple stuff.
@@ -79,11 +78,16 @@ var EasyXml = function() {
     function parseChildElement(parentXmlNode, parentObjectNode) {
         for (var key in parentObjectNode) {
             if (parentObjectNode.hasOwnProperty(key)) {
+                var isAttribute = function(slf) { 
+                    return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
+                };
                 var child = parentObjectNode[key];
                 var el = null;
 
-                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+                if (!isAttribute(self))
                     el = subElement(parentXmlNode, key);
+
+                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
                     for (var key in child) {
                         if (typeof child[key] === 'object') {
                             parseChildElement(el, child[key]);
@@ -92,9 +96,7 @@ var EasyXml = function() {
                             el.text = child[key].toString();
                         }
                     }
-                    // parseChildElement(, child);
-                } else if (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar) {
-                    // Attribute
+                } else if (isAttribute(self)) {
                     if (typeof child === 'string' || typeof child === 'number') {
                         if(key === self.config.underscoreChar)
                           parentXmlNode.text=child;
@@ -103,12 +105,8 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
-                } else if (child === null) {
-                    // Null data, send an empty tag
-                    el = subElement(parentXmlNode, key);
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
                     // Date
-                    el = subElement(parentXmlNode, key);
                     if (self.config.dateFormat === 'ISO') {
                         // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
                         el.text = child.toISOString();
@@ -121,7 +119,7 @@ var EasyXml = function() {
                         var min     = zeroPadTen(child.getMinutes());
                         var ss      = zeroPadTen(child.getSeconds());
 
-                        el.text = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
+                        el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
                     } else if (self.config.dateFormat === 'JS') {
                         // JavaScript date format
                         el.text = child.toString();
@@ -130,8 +128,8 @@ var EasyXml = function() {
                     }
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Array') {
                     // Array
-                    el = subElement(parentXmlNode, key);
-                    var subElementName = key.singular();
+                    var subElementName = inflect.singularize(key);
+
                     for (var key2 in child) {
                         // Check type of child element
                         if (child.hasOwnProperty(key2) && typeof child[key2] === 'object') {
@@ -145,23 +143,11 @@ var EasyXml = function() {
                     }
                 } else if (typeof child === 'object') {
                     // Object, go deeper
-                    el = subElement(parentXmlNode, key);
                     parseChildElement(el, child);
-                } else if (typeof child === 'number') {
-                    // It's a number
-                    el = subElement(parentXmlNode, key);
+                } else if (typeof child === 'number' || typeof child === 'boolean') {
                     el.text = child.toString();
                 } else if (typeof child === 'string') {
-                    // It's a string
-                    el = subElement(parentXmlNode, key);
                     el.text = child;
-                } else if (typeof child === 'boolean') {
-                    // It's a true or a false
-                    el = subElement(parentXmlNode, key);
-                    el.text = child.toString();
-                } else if (typeof child === 'undefined') {
-                    // It's undefined
-                    el = subElement(parentXmlNode, key);
                 } else {
                     throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
