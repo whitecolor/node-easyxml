@@ -120,7 +120,7 @@ var EasyXml = function() {
                         var min     = zeroPadTen(child.getMinutes());
                         var ss      = zeroPadTen(child.getSeconds());
 
-                        el.text = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
+                        el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
                     } else if (self.config.dateFormat === 'JS') {
                         // JavaScript date format
                         el.text = child.toString();
