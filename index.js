@@ -78,11 +78,16 @@ var EasyXml = function() {
     function parseChildElement(parentXmlNode, parentObjectNode) {
         for (var key in parentObjectNode) {
             if (parentObjectNode.hasOwnProperty(key)) {
+                var isAttribute = function(slf) { 
+                    return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
+                };
                 var child = parentObjectNode[key];
                 var el = null;
 
-                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+                if (!isAttribute(self))
                     el = subElement(parentXmlNode, key);
+
+                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
                     for (var key in child) {
                         if (typeof child[key] === 'object') {
                             parseChildElement(el, child[key]);
@@ -92,7 +97,7 @@ var EasyXml = function() {
                         }
                     }
                     // parseChildElement(, child);
-                } else if (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar) {
+                } else if (isAttribute(self)) {
                     // Attribute
                     if (typeof child === 'string' || typeof child === 'number') {
                         if(key === self.config.underscoreChar)
@@ -102,12 +107,8 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
-                } else if (child === null) {
-                    // Null data, send an empty tag
-                    el = subElement(parentXmlNode, key);
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
                     // Date
-                    el = subElement(parentXmlNode, key);
                     if (self.config.dateFormat === 'ISO') {
                         // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
                         el.text = child.toISOString();
@@ -129,7 +130,6 @@ var EasyXml = function() {
                     }
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Array') {
                     // Array
-                    el = subElement(parentXmlNode, key);
                     var subElementName = inflect.singularize(key);
 
                     for (var key2 in child) {
@@ -145,16 +145,11 @@ var EasyXml = function() {
                     }
                 } else if (typeof child === 'object') {
                     // Object, go deeper
-                    el = subElement(parentXmlNode, key);
                     parseChildElement(el, child);
                 } else if (typeof child === 'number' || typeof child === 'boolean') {
-                    el = subElement(parentXmlNode, key);
                     el.text = child.toString();
                 } else if (typeof child === 'string') {
-                    el = subElement(parentXmlNode, key);
                     el.text = child;
-                } else if (typeof child === 'undefined') {
-                    el = subElement(parentXmlNode, key);
                 } else {
                     throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
