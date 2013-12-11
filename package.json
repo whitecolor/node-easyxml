@@ -1,12 +1,12 @@
 {
     "name": "easyxml",
     "preferGlobal": false,
-    "version": "0.0.4",
+    "version": "0.0.5",
     "author": "Thomas Hunter <tlhunter@gmail.com>",
     "description": "A configurable object to XML converter",
     "repository": {
         "type": "git",
-        "url": "https://github.com/QuickenLoans/node-easyxml"
+        "url": "https://github.com/tlhunter/node-easyxml"
     },
     "contributors": [
         {
