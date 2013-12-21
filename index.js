@@ -78,7 +78,7 @@ var EasyXml = function() {
     function parseChildElement(parentXmlNode, parentObjectNode) {
         for (var key in parentObjectNode) {
             if (parentObjectNode.hasOwnProperty(key)) {
-                var isAttribute = function(slf) { 
+                var isAttribute = function(slf) {
                     return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
                 };
                 var child = parentObjectNode[key];
@@ -105,6 +105,8 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
+                } else if (child === null) {
+                    el.text = ""
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
                     // Date
                     if (self.config.dateFormat === 'ISO') {

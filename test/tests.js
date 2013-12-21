@@ -15,7 +15,8 @@ describe("Node EasyXML", function () {
         "singularizeChildren" : "should parse a JSON object without singularizeChildren to XML",
         "singularizeChildren2" : "should parse a JSON object without singularizeChildren to XML (with object)",
         "singularizeChildren3" : "should parse a JSON object with correct captalization",
-        "complex" : "testing a more complex XML object"
+        "complex" : "testing a more complex XML object",
+        "null"    : "should parse a null value"
       };
 
   Object.keys(should)
