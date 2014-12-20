@@ -1,39 +1,39 @@
 {
-    "name": "easyxml",
-    "preferGlobal": false,
-    "version": "0.0.5",
-    "author": "Thomas Hunter <me@thomashunter.name>",
-    "description": "A configurable object to XML converter",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/tlhunter/node-easyxml"
+  "name": "easyxml",
+  "preferGlobal": false,
+  "version": "0.0.6",
+  "author": "Thomas Hunter <me@thomashunter.name>",
+  "description": "A configurable object to XML converter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tlhunter/node-easyxml"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "contributors": [
+    {
+      "name": "Thomas Hunter",
+      "email": "me@thomashunter.name"
     },
-    "scripts": {
-        "test": "mocha"
-    },
-    "contributors": [
-        {
-            "name": "Thomas Hunter",
-            "email": "me@thomashunter.name"
-        },
-        {
-            "name": "Joshua Kalis",
-            "email": "JoshKalis@QuickenLoans.com"
-        }
-    ],
-    "dependencies": {
-        "elementtree": "^0.1.6",
-        "inflect": "^0.3.0"
-    },
-    "devDependencies": {
-        "chai": "1.4.2",
-        "mocha": "1.8.1"
-    },
-    "license": "Dual BSD/GPL",
-    "engines": {
-        "node": ">= 0.8"
-    },
-    "keywords": [
-        "xml"
-    ]
+    {
+      "name": "Joshua Kalis",
+      "email": "JoshKalis@QuickenLoans.com"
+    }
+  ],
+  "dependencies": {
+    "elementtree": "^0.1.6",
+    "inflect": "^0.3.0"
+  },
+  "devDependencies": {
+    "chai": "1.4.2",
+    "mocha": "1.8.1"
+  },
+  "license": "Dual BSD/GPL",
+  "engines": {
+    "node": ">= 0.8"
+  },
+  "keywords": [
+    "xml"
+  ]
 }
