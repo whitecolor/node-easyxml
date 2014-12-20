@@ -1,3 +1,4 @@
+// vim: noai:ts=2:sw=2
 /*jshint strict:false*/
 /*global __dirname describe it require*/
 
@@ -15,17 +16,28 @@ describe("Node EasyXML", function () {
         "singularizeChildren" : "should parse a JSON object without singularizeChildren to XML",
         "singularizeChildren2" : "should parse a JSON object without singularizeChildren to XML (with object)",
         "singularizeChildren3" : "should parse a JSON object with correct captalization",
-        "complex" : "testing a more complex XML object"
+        "complex" : "testing a more complex XML object",
+        "unwrappedArrays" : "should be able to use unwrapped child nodes to represent an array",
+        "wrappedArrays" : "should normally wrap array elements in a single parent element",
+        "null"    : "should parse a null value"
       };
 
   Object.keys(should)
     .forEach(function(name){
       it(should[name], function (done) {
+        var config = {};
         if (name === 'singularizeChildren' || name === 'singularizeChildren2') {
-          easyXML.configure({ singularizeChildren: false });
+          config.singularizeChildren = false;
         } else {
-          easyXML.configure({ singularizeChildren: true });
+          config.singularizeChildren = true;
         }
+        if (name === 'unwrappedArrays') {
+          config.unwrappedArrays = true;
+        } else {
+          config.unwrappedArrays = false;
+        }
+
+        easyXML.configure(config);
 
         var file = __dirname + "/fixtures/" + name;
 

@@ -44,6 +44,7 @@ var EasyXml = function() {
         rootElement: 'response',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
+        unwrappedArrays:false,
         indent: 4
     };
 
@@ -78,7 +79,7 @@ var EasyXml = function() {
     function parseChildElement(parentXmlNode, parentObjectNode) {
         for (var key in parentObjectNode) {
             if (parentObjectNode.hasOwnProperty(key)) {
-                var isAttribute = function(slf) { 
+                var isAttribute = function(slf) {
                     return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
                 };
                 var child = parentObjectNode[key];
@@ -105,6 +106,8 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
+                } else if (child === null) {
+                    el.text = ""
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
                     // Date
                     if (self.config.dateFormat === 'ISO') {
@@ -131,15 +134,17 @@ var EasyXml = function() {
                     var subElementName = inflect.singularize(key);
 
                     for (var key2 in child) {
+                        // if unwrapped arrays, make new subelements on the parent.
+                        var el2 = (self.config.unwrappedArrays === true) ? ((el) || subElement(parentXmlNode, key)) : (subElement(el, subElementName));
                         // Check type of child element
                         if (child.hasOwnProperty(key2) && typeof child[key2] === 'object') {
-                            var el2 = subElement(el, subElementName);
                             parseChildElement(el2, child[key2]);
                         } else {
                             // Just add element directly without parsing
-                            var el2 = subElement(el, subElementName);
                             el2.text = child[key2].toString();
                         }
+                        // if unwrapped arrays, the initial child element has been consumed:
+                        if (self.config.unwrappedArrays === true) el = undefined;
                     }
                 } else if (typeof child === 'object') {
                     // Object, go deeper
