@@ -33,12 +33,21 @@ bunch of sub elements with the singular version of the name. This library
 allows for all of that. Can be configured globally as well as on a per
 usage basis.
 
-## Example
-
-### Input Object
+## Example Usage
 
 ```javascript
-{
+var easyxml = require('easyxml');
+
+easyxml.configure({
+    singularizeChildren: true,
+    underscoreAttributes: true,
+    rootElement: 'response',
+    dateFormat: 'ISO', // JS, SQL
+    indent: 2,
+    manifest: true
+});
+
+var myObject = {
     items: [{
         name: 'one',
         _id: 1
@@ -53,23 +62,12 @@ usage basis.
     when: new Date(),
     boolz: true,
     nullz: null
-}
+};
+
+console.log(easyxml.render(myObject));
 ```
 
-### Example Config
-
-```javascript
-{
-    singularizeChildren: true,
-    underscoreAttributes: true,
-    rootElement: 'response',
-    dateFormat: 'ISO', // JS, SQL
-    indent: 2,
-    manifest: true
-}
-```
-
-### Output XML
+This should output the following XML document:
 
 ```xml
 <?xml version='1.0' encoding='utf-8'?>
