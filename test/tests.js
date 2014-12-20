@@ -19,7 +19,8 @@ describe("Node EasyXML", function () {
         "complex" : "testing a more complex XML object",
         "unwrappedArrays" : "should be able to use unwrapped child nodes to represent an array",
         "wrappedArrays" : "should normally wrap array elements in a single parent element",
-        "null"    : "should parse a null value"
+        "null"    : "should parse a null value",
+        "arrayRoot": "should use proper names when array is root"
       };
 
   Object.keys(should)

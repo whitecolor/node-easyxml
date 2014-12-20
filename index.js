@@ -45,6 +45,7 @@ var EasyXml = function() {
         rootElement: 'response',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
+        objectRoot: 'node',
         unwrappedArrays:false,
         indent: 4
     };
@@ -85,6 +86,10 @@ var EasyXml = function() {
                 };
                 var child = parentObjectNode[key];
                 var el = null;
+
+                if (!isNaN(key)) {
+                    key = self.config.objectRoot;
+                }
 
                 if (!isAttribute(self))
                     el = subElement(parentXmlNode, key);
@@ -154,6 +159,8 @@ var EasyXml = function() {
                     el.text = child.toString();
                 } else if (typeof child === 'string') {
                     el.text = child;
+                } else if (typeof child === 'undefined') {
+                    el = subElement(parentXmlNode, key);
                 } else {
                     throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
