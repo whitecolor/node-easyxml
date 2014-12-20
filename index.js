@@ -1,8 +1,9 @@
-var et = require('elementtree'),
-    inflect = require('inflect'),
-    ElementTree = et.ElementTree,
-    element = et.Element,
-    subElement = et.SubElement;
+var et = require('elementtree');
+var inflect = require('inflect');
+
+var ElementTree = et.ElementTree;
+var element = et.Element;
+var subElement = et.SubElement;
 
 /**
  * This function merges two objects. Pretty simple stuff.
