@@ -2,16 +2,19 @@
     "name": "easyxml",
     "preferGlobal": false,
     "version": "0.0.5",
-    "author": "Thomas Hunter <tlhunter@gmail.com>",
+    "author": "Thomas Hunter <me@thomashunter.name>",
     "description": "A configurable object to XML converter",
     "repository": {
         "type": "git",
         "url": "https://github.com/tlhunter/node-easyxml"
     },
+    "scripts": {
+        "test": "mocha"
+    },
     "contributors": [
         {
             "name": "Thomas Hunter",
-            "email": "tlhunter@gmail.com"
+            "email": "me@thomashunter.name"
         },
         {
             "name": "Joshua Kalis",
@@ -19,8 +22,8 @@
         }
     ],
     "dependencies": {
-        "elementtree": "0.1.5",
-        "inflect": "0.3.x"
+        "elementtree": "^0.1.6",
+        "inflect": "^0.3.0"
     },
     "devDependencies": {
         "chai": "1.4.2",
