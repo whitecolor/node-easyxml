@@ -55,4 +55,52 @@ describe("Node EasyXML", function () {
         });
       });
     });
+    var undefinedTests = {
+        undefinedHandling: { 
+            mochaDesc: "Handling undefine in arrays and as elements",
+            config: {
+                singularizeChildren: true,
+                unwrappedArrays: false
+            }
+        },
+        undefinedHandlingFiltered: { 
+            mochaDesc: "Handling undefine in arrays and as elements",
+            config: {
+                singularizeChildren: true,
+                unwrappedArrays: false,
+                filterNulls: true
+            }
+        }
+    };
+    Object.keys(undefinedTests).forEach(function(name) {
+      it(undefinedTests[name].mochaDesc, function(done) {
+        var file = __dirname + "/fixtures/" + name;
+        var json = {
+            undef: undefined,
+            undefObj: {
+                undefSubKey: undefined,
+            },
+            undefs: [
+                undefined,
+                null,
+                'not-null'
+            ],
+            undef1s:[
+                undefined,
+                null,
+            ]
+        };
+        fs.readFile(file + ".xml", "UTF-8", function (err, data) {
+            if (err) {
+                throw err;
+                console.error(err);
+            }
+            easyXML.configure(undefinedTests[name].config);
+            assert.equal(easyXML.render(json), data, "EasyXML should create the correct XML from a JSON data structure.");
+            assert.strictEqual(easyXML.render(json), data, "EasyXML should create the correct XML from a JSON data structure.");
+
+            done();
+        });
+      });
+    });
 });

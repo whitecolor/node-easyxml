@@ -1,4 +1,7 @@
 {
   "boolz": true,
-  "nullz": null
+  "nullz": null, 
+  "nullEls" : [
+    null
+  ]
 }

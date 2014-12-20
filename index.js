@@ -45,7 +45,8 @@ var EasyXml = function() {
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
         unwrappedArrays:false,
-        indent: 4
+        indent: 4,
+        filterNulls:false
     };
 
     /**
@@ -72,6 +73,9 @@ var EasyXml = function() {
         });
     };
 
+    var isFilterNulls = function(child) {
+        return self.config.filterNulls === true;
+    };
     /**
      * Recursive, Private
      * Takes an object and attaches it to the XML doc
@@ -82,15 +86,34 @@ var EasyXml = function() {
                 var isAttribute = function(self) {
                     return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
                 };
+                var isChildKeyParsed = function(child) {
+                    switch(typeof child) {
+                    case 'number':
+                    case 'string':
+                    case 'boolean':
+                        return false;
+                    default:
+                        // null, undefined, objects, functions
+                        return true;
+                    }
+                }
+                     
                 var child = parentObjectNode[key];
                 var el = null;
 
+                if ( child == null && isFilterNulls()) {
+                    // no element if we are skipping nulls and undefined
+                    continue;
+                }
                 if (!isAttribute(self))
                     el = subElement(parentXmlNode, key);
 
-                if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+                if (child == null) {
+                    // allow for both null child and undefined child
+                    el.text = ""
+                } else if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
                     for (var key in child) {
-                        if (typeof child[key] === 'object') {
+                        if (isChildKeyParsed(child[key])) {
                             parseChildElement(el, child[key]);
                         } else {
                             el = subElement(el, key);
@@ -106,8 +129,6 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
-                } else if (child === null) {
-                    el.text = ""
                 } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
                     // Date
                     if (self.config.dateFormat === 'ISO') {
@@ -134,10 +155,13 @@ var EasyXml = function() {
                     var subElementName = inflect.singularize(key);
 
                     for (var key2 in child) {
+                        if ( child[key2] == null && isFilterNulls()) {
+                            continue;
+                        }
                         // if unwrapped arrays, make new subelements on the parent.
                         var el2 = (self.config.unwrappedArrays === true) ? ((el) || subElement(parentXmlNode, key)) : (subElement(el, subElementName));
                         // Check type of child element
-                        if (child.hasOwnProperty(key2) && typeof child[key2] === 'object') {
+                        if (child.hasOwnProperty(key2) && isChildKeyParsed(child[key2])) {
                             parseChildElement(el2, child[key2]);
                         } else {
                             // Just add element directly without parsing
