@@ -1,4 +1,4 @@
-## Easy XML
+# Easy XML
 
 The purpose of this module is to provide an easy to use function for
 converting your JS objects into XML. I plan on making it configurable
@@ -9,7 +9,9 @@ it synchronously.
 
 ## Installation
 
-    $ npm install easyxml
+```console
+$ npm install easyxml
+```
 
 ## Config
 
@@ -33,56 +35,62 @@ usage basis.
 
 ## Example
 
-Input Object:
+### Input Object
 
-    {
-        items: [{
-            name: 'one',
-            _id: 1
-        }, {
-            name: 'two',
-            _id: 2
-        }, {
-            name: 'three',
-            _id: 3
-        }],
-        blah: 'http://www.google.com',
-        when: new Date(),
-        boolz: true,
-        nullz: null
-    }
+```javascript
+{
+    items: [{
+        name: 'one',
+        _id: 1
+    }, {
+        name: 'two',
+        _id: 2
+    }, {
+        name: 'three',
+        _id: 3
+    }],
+    blah: 'http://www.google.com',
+    when: new Date(),
+    boolz: true,
+    nullz: null
+}
+```
 
-Example Config:
+### Example Config
 
-    {
-        singularizeChildren: true,
-        underscoreAttributes: true,
-        rootElement: 'response',
-        dateFormat: 'ISO', // JS, SQL
-        indent: 2,
-        manifest: true
-    }
+```javascript
+{
+    singularizeChildren: true,
+    underscoreAttributes: true,
+    rootElement: 'response',
+    dateFormat: 'ISO', // JS, SQL
+    indent: 2,
+    manifest: true
+}
+```
 
-Output XML:
+### Output XML
 
-    <?xml version='1.0' encoding='utf-8'?>
-    <response>
-      <items>
-        <item id="1">
-          <name>one</name>
-        </item>
-        <item id="2">
-          <name>two</name>
-        </item>
-        <item id="3">
-          <name>three</name>
-        </item>
-      </items>
-      <blah>http://www.google.com</blah>
-      <when>2012-09-25T18:47:39.485Z</when>
-      <boolz>true</boolz>
-      <nullz />
-    </response>
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<response>
+  <items>
+    <item id="1">
+      <name>one</name>
+    </item>
+    <item id="2">
+      <name>two</name>
+    </item>
+    <item id="3">
+      <name>three</name>
+    </item>
+  </items>
+  <blah>http://www.google.com</blah>
+  <when>2012-09-25T18:47:39.485Z</when>
+  <boolz>true</boolz>
+  <nullz />
+</response>
+```
 
 ## License
 
