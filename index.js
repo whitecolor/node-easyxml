@@ -1,3 +1,5 @@
+"use strict";
+
 var et = require('elementtree');
 var inflect = require('inflect');
 
@@ -75,8 +77,13 @@ var EasyXml = function() {
     };
 
     var isFilterNulls = function(child) {
-        return self.config.filterNulls === true;
+        return (child === null || child === undefined) && self.config.filterNulls === true;
     };
+
+    var isAttribute = function(key) {
+        return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
+    };
+
     /**
      * Recursive, Private
      * Takes an object and attaches it to the XML doc
@@ -84,9 +91,7 @@ var EasyXml = function() {
     function parseChildElement(parentXmlNode, parentObjectNode) {
         for (var key in parentObjectNode) {
             if (parentObjectNode.hasOwnProperty(key)) {
-                var isAttribute = function(self) {
-                    return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
-                };
+
                 var isChildKeyParsed = function(child) {
                     switch(typeof child) {
                     case 'number':
@@ -97,31 +102,33 @@ var EasyXml = function() {
                         // null, undefined, objects, functions
                         return true;
                     }
-                }
+                };
                      
                 var child = parentObjectNode[key];
                 var el = null;
 
-                if ( child == null && isFilterNulls()) {
+                if (isFilterNulls(child)) {
                     // no element if we are skipping nulls and undefined
                     continue;
                 }
-                if (!isAttribute(self))
-                    el = subElement(parentXmlNode, key);
 
-                if (child == null) {
+                if (!isAttribute(key)) {
+                    el = subElement(parentXmlNode, key);
+                }
+
+                if (child === null || child === undefined) {
                     // allow for both null child and undefined child
-                    el.text = ""
+                    el.text = "";
                 } else if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
-                    for (var key in child) {
-                        if (isChildKeyParsed(child[key])) {
-                            parseChildElement(el, child[key]);
+                    for (var subkey in child) {
+                        if (isChildKeyParsed(child[subkey])) {
+                            parseChildElement(el, child[subkey]);
                         } else {
-                            el = subElement(el, key);
-                            el.text = child[key].toString();
+                            el = subElement(el, subkey);
+                            el.text = child[subkey].toString();
                         }
                     }
-                } else if (isAttribute(self)) {
+                } else if (isAttribute(key)) {
                     if (typeof child === 'string' || typeof child === 'number') {
                         if(key === self.config.underscoreChar)
                           parentXmlNode.text=child;
@@ -130,7 +137,7 @@ var EasyXml = function() {
                     } else {
                         throw new Error(key + "contained non_string_attribute");
                     }
-                } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Date') {
+                } else if (child instanceof Date) {
                     // Date
                     if (self.config.dateFormat === 'ISO') {
                         // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
@@ -156,11 +163,13 @@ var EasyXml = function() {
                     var subElementName = inflect.singularize(key);
 
                     for (var key2 in child) {
-                        if ( child[key2] == null && isFilterNulls()) {
+                        if (isFilterNulls(child[key2])) {
                             continue;
                         }
+
                         // if unwrapped arrays, make new subelements on the parent.
                         var el2 = (self.config.unwrappedArrays === true) ? ((el) || subElement(parentXmlNode, key)) : (subElement(el, subElementName));
+
                         // Check type of child element
                         if (child.hasOwnProperty(key2) && isChildKeyParsed(child[key2])) {
                             parseChildElement(el2, child[key2]);
@@ -168,6 +177,7 @@ var EasyXml = function() {
                             // Just add element directly without parsing
                             el2.text = child[key2].toString();
                         }
+
                         // if unwrapped arrays, the initial child element has been consumed:
                         if (self.config.unwrappedArrays === true) el = undefined;
                     }
