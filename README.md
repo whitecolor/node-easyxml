@@ -1,11 +1,6 @@
 # Easy XML
 
-The purpose of this module is to provide an easy to use function for
-converting your JS objects into XML. I plan on making it configurable
-since a lot of different people have different expectations.
-
-Everything in here is CPU bound and without callbacks, so feel free to run
-it synchronously.
+Highly configurable Object to XML converter for Node.
 
 ## Installation
 
@@ -13,27 +8,7 @@ it synchronously.
 $ npm install easyxml
 ```
 
-## Config
-
-* singularizeChildren: If an array is plural, its children elements will be singular
-* underscoreAttributes: String attributes starting with _ will be XML attributes
-* rootElement: A string to wrap around your entire XML object
-* dateFormat: A date format for JS dates, currently accepts 'ISO 8601'
-* indent: A number representing the spaces to indent children, use 0 for no whitespace
-* manifest: Whether or not to add that XML manifest line to the top
-
-## Purpose
-
-I was working on a Node.js API, and I wanted to be able to build a single
-object within each of my actions, and have that object automatically
-converted into the appropriate response based on request type (JSON, XML).
-The existing object to XML converters seemed to be lacking. The biggest
-feature I wanted was that an array of elements with a plural name get a
-bunch of sub elements with the singular version of the name. This library
-allows for all of that. Can be configured globally as well as on a per
-usage basis.
-
-## Example Usage
+## Usage
 
 ```javascript
 var easyxml = require('easyxml');
@@ -89,6 +64,18 @@ This should output the following XML document:
   <nullz />
 </response>
 ```
+
+## Configuration
+
+* `singularizeChildren`: If an array is plural, its children elements will be singular
+* `underscoreAttributes`: String attributes starting with _ will be XML attributes
+* `underscoreChar`: Prefix to look for when creating attributes
+* `rootElement`: A string to wrap around your entire XML object
+* `dateFormat`: A date format for JS dates, currently accepts ISO, SQL, JS
+* `indent`: A number representing the spaces to indent children, use 0 for no whitespace
+* `manifest`: Whether or not to add that XML manifest line to the top
+* `unwrappedArrays`: TODO: Document
+* `filterNulls`: Should nulls and undefines be removed from the rendered XML
 
 ## License
 

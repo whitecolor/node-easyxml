@@ -47,9 +47,9 @@ var EasyXml = function() {
         rootElement: 'response',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
-        unwrappedArrays:false,
+        unwrappedArrays: false,
         indent: 4,
-        filterNulls:false
+        filterNulls: false
     };
 
     /**
