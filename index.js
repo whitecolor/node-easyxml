@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var et = require('elementtree');
 var inflect = require('inflect');
@@ -90,7 +90,7 @@ EasyXml.isChildKeyParsed = function(child) {
  * Takes an object and returns an XML string
  *
  * @param {Object|Array} object
- * @param {Boolean} rootElementOverride
+ * @param {String} [rootElementOverride]
  * @returns {String} XML Document
  */
 EasyXml.prototype.render = function(object, rootElementOverride) {
@@ -236,6 +236,7 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
                 this.parseChildElement(el, child);
             } else if (typeof child === 'number' || typeof child === 'boolean') {
                 el.text = child.toString();
+                /* istanbul ignore else */
             } else if (typeof child === 'string') {
                 el.text = child;
             } else {
