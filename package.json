@@ -9,7 +9,7 @@
     "url": "https://github.com/tlhunter/node-easyxml"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "contributors": [
     {
@@ -26,8 +26,7 @@
     "inflect": "^0.3.0"
   },
   "devDependencies": {
-    "chai": "1.4.2",
-    "mocha": "1.8.1"
+    "mocha": "^2.0.1"
   },
   "license": "Dual BSD/GPL",
   "engines": {

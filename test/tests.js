@@ -1,6 +1,6 @@
 "use strict";
 
-var assert  = require("chai").assert;
+var assert  = require('assert');
 var fs = require("fs");
 var EasyXml = require("../index.js");
 
