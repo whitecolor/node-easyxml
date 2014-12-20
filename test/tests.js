@@ -2,7 +2,7 @@
 
 var assert  = require("chai").assert;
 var fs = require("fs");
-var easyXML = require("../index.js");
+var EasyXml = require("../index.js");
 
 describe("Node EasyXML", function () {
   var should = {
@@ -25,7 +25,7 @@ describe("Node EasyXML", function () {
           unwrappedArrays: name === 'unwrappedArrays'
         };
 
-        easyXML.configure(config);
+        var easyXML = new EasyXml(config);
 
         var file = __dirname + "/fixtures/" + name;
 
@@ -87,7 +87,7 @@ describe("Node EasyXML", function () {
                 throw err;
             }
 
-            easyXML.configure(undefinedTests[name].config);
+            var easyXML = new EasyXml(undefinedTests[name].config);
             assert.equal(easyXML.render(json), data, "EasyXML should create the correct XML from a JSON data structure.");
             assert.strictEqual(easyXML.render(json), data, "EasyXML should create the correct XML from a JSON data structure.");
 
@@ -101,8 +101,12 @@ describe("Node EasyXML", function () {
             date: new Date('December 17, 1995 03:24:00')
         };
 
+        var easyXML = new EasyXml({
+            indent: 0
+        });
+
         var after = easyXML.render(before);
 
-        assert.equal(after, "<response>\n    <date>1995-12-17T11:24:00.000Z</date>\n</response>\n");
+        assert.equal(after, "<response>\n<date>1995-12-17T11:24:00.000Z</date>\n</response>\n");
     });
 });

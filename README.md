@@ -11,18 +11,18 @@ $ npm install easyxml
 ## Usage
 
 ```javascript
-var easyxml = require('easyxml');
+var EasyXml = require('easyxml');
 
-easyxml.configure({
+var serializer = new EasyXml({
     singularizeChildren: true,
-    underscoreAttributes: true,
+    allowAttributes: true,
     rootElement: 'response',
-    dateFormat: 'ISO', // JS, SQL
+    dateFormat: 'ISO',
     indent: 2,
     manifest: true
 });
 
-var myObject = {
+var obj = {
     items: [{
         name: 'one',
         _id: 1
@@ -39,7 +39,7 @@ var myObject = {
     nullz: null
 };
 
-console.log(easyxml.render(myObject));
+console.log(serializer.render(obj));
 ```
 
 This should output the following XML document:
@@ -68,8 +68,8 @@ This should output the following XML document:
 ## Configuration
 
 * `singularizeChildren`: If an array is plural, its children elements will be singular
-* `underscoreAttributes`: String attributes starting with _ will be XML attributes
-* `underscoreChar`: Prefix to look for when creating attributes
+* `allowAttributes`: String attributes starting with _ will be XML attributes
+* `attributePrefix`: Prefix to look for when creating attributes
 * `rootElement`: A string to wrap around your entire XML object
 * `dateFormat`: A date format for JS dates, currently accepts ISO, SQL, JS
 * `indent`: A number representing the spaces to indent children, use 0 for no whitespace

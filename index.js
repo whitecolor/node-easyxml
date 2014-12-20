@@ -8,162 +8,193 @@ var element = et.Element;
 var subElement = et.SubElement;
 
 /**
- * This function merges two objects. Pretty simple stuff.
+ * Instantiate a new EasyXml instance
+ *
+ * @param {Object} config
+ * @constructor
  */
-function merge(obj1, obj2) {
-    var obj3 = {};
-    for (var attr1 in obj1) {
-        obj3[attr1] = obj1[attr1];
-    }
-    for (var attr2 in obj2) {
-        obj3[attr2] = obj2[attr2];
-    }
-    return obj3;
-}
-
-/**
- * This function pads a number so that it is two digits
- */
-function zeroPadTen(val) {
-    if (val < 10) {
-        return "0" + val;
-    }
-    return val;
-}
-
-/**
- * This is our main EasyXml object which gets exported as a module
- */
-var EasyXml = function() {
-    var self = this;
-
-    /**
-     * Default configuration object
-     */
-    self.config = {
+var EasyXml = function(config) {
+    this.config = EasyXml.merge({
         singularizeChildren: true,
-        underscoreAttributes: true,
-        underscoreChar: '_',
+        allowAttributes: true,
+        attributePrefix: '_',
         rootElement: 'response',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
         unwrappedArrays: false,
         indent: 4,
         filterNulls: false
-    };
+    }, config);
+};
 
-    /**
-     * Public
-     * Merges in the provided config object with the defaults
-     */
-    self.configure = function(config) {
-        // should be merge, otherwise we lose defaults
-        self.config = merge(self.config, config);
-    };
+/**
+ * Merges two objects and returns the result
+ *
+ * @param {Object} obj1
+ * @param {Object} obj2
+ * @returns {Object} Properties from obj1 and obj2
+ * @static
+ */
+EasyXml.merge = function(obj1, obj2) {
+    var obj3 = {};
 
-    /**
-     * Public
-     * Takes an object and returns an XML string
-     */
-    self.render = function(object, rootElementOverride) {
-        var xml = element(rootElementOverride || self.config.rootElement);
+    for (var attr1 in obj1) {
+        if (obj1.hasOwnProperty(attr1)) {
+            obj3[attr1] = obj1[attr1];
+        }
+    }
 
-        parseChildElement(xml, object);
+    for (var attr2 in obj2) {
+        if (obj2.hasOwnProperty(attr2)) {
+            obj3[attr2] = obj2[attr2];
+        }
+    }
 
-        return new ElementTree(xml).write({
-            xml_declaration: self.config.manifest,
-            indent: self.config.indent
-        });
-    };
+    return obj3;
+};
 
-    var isFilterNulls = function(child) {
-        return (child === null || child === undefined) && self.config.filterNulls === true;
-    };
+/**
+ * Pads a number so that it is two digits
+ *
+ * @param {Number} val
+ * @returns {String}
+ * @static
+ */
+EasyXml.zeroPadTen = function(val) {
+    if (val < 10) {
+        return "0" + val;
+    }
 
-    var isAttribute = function(key) {
-        return (self.config.underscoreAttributes && key.charAt(0) === self.config.underscoreChar);
-    };
+    return val.toString();
+};
 
-    /**
-     * Recursive, Private
-     * Takes an object and attaches it to the XML doc
-     */
-    function parseChildElement(parentXmlNode, parentObjectNode) {
-        for (var key in parentObjectNode) {
-            if (parentObjectNode.hasOwnProperty(key)) {
+/**
+ * Takes an object and returns an XML string
+ *
+ * @param {Object|Array} object
+ * @param {Boolean} rootElementOverride
+ * @returns {String} XML Document
+ */
+EasyXml.prototype.render = function(object, rootElementOverride) {
+    var xml = element(rootElementOverride || this.config.rootElement);
 
-                var isChildKeyParsed = function(child) {
-                    switch(typeof child) {
-                    case 'number':
-                    case 'string':
-                    case 'boolean':
-                        return false;
-                    default:
-                        // null, undefined, objects, functions
-                        return true;
-                    }
-                };
-                     
-                var child = parentObjectNode[key];
-                var el = null;
+    this.parseChildElement(xml, object);
 
-                if (isFilterNulls(child)) {
-                    // no element if we are skipping nulls and undefined
-                    continue;
+    return new ElementTree(xml).write({
+        xml_declaration: this.config.manifest,
+        indent: this.config.indent
+    });
+};
+
+/**
+ * Check if this item doesn't exist and if we should not render it
+ *
+ * @param child Attribute being checked
+ * @returns {Boolean}
+ */
+EasyXml.prototype.filterNull = function(child) {
+    return (child === null || child === undefined) && this.config.filterNulls === true;
+};
+
+/**
+ * Checks to see if the given key should be rendered as an attribute
+ *
+ * @param {String} key
+ * @returns {Boolean}
+ */
+EasyXml.prototype.isAttribute = function(key) {
+    return this.config.allowAttributes && key[0] === this.config.attributePrefix;
+};
+
+/**
+ * Takes an object and attaches it to the XML doc
+ *
+ * @param {Element} parentXmlNode
+ * @param {Element} parentObjectNode
+ * @retursive
+ */
+EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) {
+    var self = this;
+
+    for (var key in parentObjectNode) {
+        if (parentObjectNode.hasOwnProperty(key)) {
+
+            var isChildKeyParsed = function(child) {
+                switch(typeof child) {
+                case 'number':
+                case 'string':
+                case 'boolean':
+                    return false;
+                default:
+                    // null, undefined, objects, functions
+                    return true;
                 }
+            };
 
-                if (!isAttribute(key)) {
-                    el = subElement(parentXmlNode, key);
-                }
+            var child = parentObjectNode[key];
+            var el = null;
 
-                if (child === null || child === undefined) {
-                    // allow for both null child and undefined child
-                    el.text = "";
-                } else if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
-                    for (var subkey in child) {
+            if (self.filterNull(child)) {
+                // no element if we are skipping nulls and undefined
+                continue;
+            }
+
+            if (!self.isAttribute(key)) {
+                el = subElement(parentXmlNode, key);
+            }
+
+            if (child === null || child === undefined) {
+                // allow for both null child and undefined child
+                el.text = "";
+            } else if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+                for (var subkey in child) {
+                    if (child.hasOwnProperty(subkey)) {
                         if (isChildKeyParsed(child[subkey])) {
-                            parseChildElement(el, child[subkey]);
+                            self.parseChildElement(el, child[subkey]);
                         } else {
                             el = subElement(el, subkey);
                             el.text = child[subkey].toString();
                         }
                     }
-                } else if (isAttribute(key)) {
-                    if (typeof child === 'string' || typeof child === 'number') {
-                        if(key === self.config.underscoreChar)
-                          parentXmlNode.text=child;
-                        else
-                          parentXmlNode.set(key.substring(1), child);
+                }
+            } else if (self.isAttribute(key)) {
+                if (typeof child === 'string' || typeof child === 'number') {
+                    if (key === self.config.attributePrefix) {
+                        parentXmlNode.text = child;
                     } else {
-                        throw new Error(key + "contained non_string_attribute");
+                        parentXmlNode.set(key.substring(1), child);
                     }
-                } else if (child instanceof Date) {
-                    // Date
-                    if (self.config.dateFormat === 'ISO') {
-                        // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
-                        el.text = child.toISOString();
-                    } else if (self.config.dateFormat === 'SQL') {
-                        // SQL: YYYY-MM-DD HH:MM:SS
-                        var yyyy    = child.getFullYear();
-                        var mm      = zeroPadTen(child.getMonth() + 1);
-                        var dd      = zeroPadTen(child.getDate());
-                        var hh      = zeroPadTen(child.getHours());
-                        var min     = zeroPadTen(child.getMinutes());
-                        var ss      = zeroPadTen(child.getSeconds());
+                } else {
+                    throw new Error(key + "contained non_string_attribute");
+                }
+            } else if (child instanceof Date) {
+                // Date
+                if (self.config.dateFormat === 'ISO') {
+                    // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
+                    el.text = child.toISOString();
+                } else if (self.config.dateFormat === 'SQL') {
+                    // SQL: YYYY-MM-DD HH:MM:SS
+                    var yyyy    = child.getFullYear();
+                    var mm      = EasyXml.zeroPadTen(child.getMonth() + 1);
+                    var dd      = EasyXml.zeroPadTen(child.getDate());
+                    var hh      = EasyXml.zeroPadTen(child.getHours());
+                    var min     = EasyXml.zeroPadTen(child.getMinutes());
+                    var ss      = EasyXml.zeroPadTen(child.getSeconds());
 
-                        el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
-                    } else if (self.config.dateFormat === 'JS') {
-                        // JavaScript date format
-                        el.text = child.toString();
-                    } else {
-                        throw new Error(key + "contained unknown_date_format");
-                    }
-                } else if (typeof child === 'object' && child.constructor && child.constructor.name && child.constructor.name === 'Array') {
-                    // Array
-                    var subElementName = inflect.singularize(key);
+                    el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
+                } else if (self.config.dateFormat === 'JS') {
+                    // JavaScript date format
+                    el.text = child.toString();
+                } else {
+                    throw new Error(key + "contained unknown_date_format");
+                }
+            } else if (child instanceof Array) {
+                // Array
+                var subElementName = inflect.singularize(key);
 
-                    for (var key2 in child) {
-                        if (isFilterNulls(child[key2])) {
+                for (var key2 in child) {
+                    if (child.hasOwnProperty(key2)) {
+                        if (self.filterNull(child[key2])) {
                             continue;
                         }
 
@@ -172,7 +203,7 @@ var EasyXml = function() {
 
                         // Check type of child element
                         if (child.hasOwnProperty(key2) && isChildKeyParsed(child[key2])) {
-                            parseChildElement(el2, child[key2]);
+                            self.parseChildElement(el2, child[key2]);
                         } else {
                             // Just add element directly without parsing
                             el2.text = child[key2].toString();
@@ -181,19 +212,19 @@ var EasyXml = function() {
                         // if unwrapped arrays, the initial child element has been consumed:
                         if (self.config.unwrappedArrays === true) el = undefined;
                     }
-                } else if (typeof child === 'object') {
-                    // Object, go deeper
-                    parseChildElement(el, child);
-                } else if (typeof child === 'number' || typeof child === 'boolean') {
-                    el.text = child.toString();
-                } else if (typeof child === 'string') {
-                    el.text = child;
-                } else {
-                    throw new Error(key + " contained unknown_data_type: " + typeof child);
                 }
+            } else if (typeof child === 'object') {
+                // Object, go deeper
+                self.parseChildElement(el, child);
+            } else if (typeof child === 'number' || typeof child === 'boolean') {
+                el.text = child.toString();
+            } else if (typeof child === 'string') {
+                el.text = child;
+            } else {
+                throw new Error(key + " contained unknown_data_type: " + typeof child);
             }
         }
     }
 };
 
-module.exports = new EasyXml();
+module.exports = EasyXml;
