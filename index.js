@@ -19,6 +19,7 @@ var EasyXml = function(config) {
         allowAttributes: true,
         attributePrefix: '_',
         rootElement: 'response',
+        rootArray: 'items',
         dateFormat: 'ISO', // ISO = ISO8601, SQL = MySQL Timestamp, JS = (new Date).toString()
         manifest: false,
         unwrappedArrays: false,
@@ -69,6 +70,23 @@ EasyXml.zeroPadTen = function(val) {
 };
 
 /**
+ * Should we bother parsing this child attribute
+ * @param child
+ * @returns {Boolean}
+ */
+EasyXml.isChildKeyParsed = function(child) {
+    switch(typeof child) {
+        case 'number':
+        case 'string':
+        case 'boolean':
+            return false;
+        default:
+            // null, undefined, objects, functions
+            return true;
+    }
+};
+
+/**
  * Takes an object and returns an XML string
  *
  * @param {Object|Array} object
@@ -76,7 +94,17 @@ EasyXml.zeroPadTen = function(val) {
  * @returns {String} XML Document
  */
 EasyXml.prototype.render = function(object, rootElementOverride) {
-    var xml = element(rootElementOverride || this.config.rootElement);
+    var root;
+
+    if (rootElementOverride) {
+        root = rootElementOverride;
+    } else if (object instanceof Array) {
+        root = this.config.rootArray;
+    } else {
+        root = this.config.rootElement;
+    }
+
+    var xml = element(root);
 
     this.parseChildElement(xml, object);
 
@@ -114,52 +142,42 @@ EasyXml.prototype.isAttribute = function(key) {
  * @retursive
  */
 EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) {
-    var self = this;
-
     for (var key in parentObjectNode) {
         if (parentObjectNode.hasOwnProperty(key)) {
-
-            var isChildKeyParsed = function(child) {
-                switch(typeof child) {
-                case 'number':
-                case 'string':
-                case 'boolean':
-                    return false;
-                default:
-                    // null, undefined, objects, functions
-                    return true;
-                }
-            };
 
             var child = parentObjectNode[key];
             var el = null;
 
-            if (self.filterNull(child)) {
+            if (this.filterNull(child)) {
                 // no element if we are skipping nulls and undefined
                 continue;
             }
 
-            if (!self.isAttribute(key)) {
+            if (!isNaN(key)) {
+                key = inflect.singularize(this.config.rootArray);
+            }
+
+            if (!this.isAttribute(key)) {
                 el = subElement(parentXmlNode, key);
             }
 
             if (child === null || child === undefined) {
                 // allow for both null child and undefined child
                 el.text = "";
-            } else if (!self.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
+            } else if (!this.config.singularizeChildren && typeof parentXmlNode === 'object' && typeof child === 'object') {
                 for (var subkey in child) {
                     if (child.hasOwnProperty(subkey)) {
-                        if (isChildKeyParsed(child[subkey])) {
-                            self.parseChildElement(el, child[subkey]);
+                        if (EasyXml.isChildKeyParsed(child[subkey])) {
+                            this.parseChildElement(el, child[subkey]);
                         } else {
                             el = subElement(el, subkey);
                             el.text = child[subkey].toString();
                         }
                     }
                 }
-            } else if (self.isAttribute(key)) {
+            } else if (this.isAttribute(key)) {
                 if (typeof child === 'string' || typeof child === 'number') {
-                    if (key === self.config.attributePrefix) {
+                    if (key === this.config.attributePrefix) {
                         parentXmlNode.text = child;
                     } else {
                         parentXmlNode.set(key.substring(1), child);
@@ -169,10 +187,10 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
                 }
             } else if (child instanceof Date) {
                 // Date
-                if (self.config.dateFormat === 'ISO') {
+                if (this.config.dateFormat === 'ISO') {
                     // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
                     el.text = child.toISOString();
-                } else if (self.config.dateFormat === 'SQL') {
+                } else if (this.config.dateFormat === 'SQL') {
                     // SQL: YYYY-MM-DD HH:MM:SS
                     var yyyy    = child.getFullYear();
                     var mm      = EasyXml.zeroPadTen(child.getMonth() + 1);
@@ -182,7 +200,7 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
                     var ss      = EasyXml.zeroPadTen(child.getSeconds());
 
                     el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
-                } else if (self.config.dateFormat === 'JS') {
+                } else if (this.config.dateFormat === 'JS') {
                     // JavaScript date format
                     el.text = child.toString();
                 } else {
@@ -194,28 +212,28 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
 
                 for (var key2 in child) {
                     if (child.hasOwnProperty(key2)) {
-                        if (self.filterNull(child[key2])) {
+                        if (this.filterNull(child[key2])) {
                             continue;
                         }
 
                         // if unwrapped arrays, make new subelements on the parent.
-                        var el2 = (self.config.unwrappedArrays === true) ? ((el) || subElement(parentXmlNode, key)) : (subElement(el, subElementName));
+                        var el2 = (this.config.unwrappedArrays === true) ? ((el) || subElement(parentXmlNode, key)) : (subElement(el, subElementName));
 
                         // Check type of child element
-                        if (child.hasOwnProperty(key2) && isChildKeyParsed(child[key2])) {
-                            self.parseChildElement(el2, child[key2]);
+                        if (child.hasOwnProperty(key2) && EasyXml.isChildKeyParsed(child[key2])) {
+                            this.parseChildElement(el2, child[key2]);
                         } else {
                             // Just add element directly without parsing
                             el2.text = child[key2].toString();
                         }
 
                         // if unwrapped arrays, the initial child element has been consumed:
-                        if (self.config.unwrappedArrays === true) el = undefined;
+                        if (this.config.unwrappedArrays === true) el = undefined;
                     }
                 }
             } else if (typeof child === 'object') {
                 // Object, go deeper
-                self.parseChildElement(el, child);
+                this.parseChildElement(el, child);
             } else if (typeof child === 'number' || typeof child === 'boolean') {
                 el.text = child.toString();
             } else if (typeof child === 'string') {

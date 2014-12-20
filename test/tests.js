@@ -15,7 +15,9 @@ describe("Node EasyXML", function () {
     "complex": "testing a more complex XML object",
     "unwrappedArrays": "should be able to use unwrapped child nodes to represent an array",
     "wrappedArrays": "should normally wrap array elements in a single parent element",
-    "null": "should parse a null value"
+    "null": "should parse a null value",
+    "rootArray1": "should work as expected when root is an array of objects",
+    "rootArray2": "should work as expected when root is an array of strings"
   };
 
   Object.keys(should).forEach(function(name) {
@@ -46,14 +48,14 @@ describe("Node EasyXML", function () {
 
     var undefinedTests = {
         undefinedHandling: { 
-            mochaDesc: "Handling undefine in arrays and as elements",
+            mochaDesc: "Handling undefined in arrays and as elements",
             config: {
                 singularizeChildren: true,
                 unwrappedArrays: false
             }
         },
         undefinedHandlingFiltered: { 
-            mochaDesc: "Handling undefine in arrays and as elements",
+            mochaDesc: "Handling undefined in arrays and as elements",
             config: {
                 singularizeChildren: true,
                 unwrappedArrays: false,

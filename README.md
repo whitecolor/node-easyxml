@@ -70,7 +70,8 @@ This should output the following XML document:
 * `singularizeChildren`: If an array is plural, its children elements will be singular
 * `allowAttributes`: String attributes starting with _ will be XML attributes
 * `attributePrefix`: Prefix to look for when creating attributes
-* `rootElement`: A string to wrap around your entire XML object
+* `rootElement`: A string to wrap around the rendered XML document
+* `rootArray`: If the root element is an array, this wraps the XML document. Should be plural
 * `dateFormat`: A date format for JS dates, currently accepts ISO, SQL, JS
 * `indent`: A number representing the spaces to indent children, use 0 for no whitespace
 * `manifest`: Whether or not to add that XML manifest line to the top
