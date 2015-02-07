@@ -149,6 +149,30 @@ EasyXml.prototype.isAttribute = function(key) {
  * @param {Element} parentObjectNode
  * @retursive
  */
+
+EasyXml.prototype.convertDate = function(val, key){
+
+    if (this.config.dateFormat === 'ISO') {
+        // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
+        return val.toISOString();
+    } else if (this.config.dateFormat === 'SQL') {
+        // SQL: YYYY-MM-DD HH:MM:SS
+        var yyyy    = val.getFullYear();
+        var mm      = EasyXml.zeroPadTen(val.getMonth() + 1);
+        var dd      = EasyXml.zeroPadTen(val.getDate());
+        var hh      = EasyXml.zeroPadTen(val.getHours());
+        var min     = EasyXml.zeroPadTen(val.getMinutes());
+        var ss      = EasyXml.zeroPadTen(val.getSeconds());
+
+        return [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
+    } else if (this.config.dateFormat === 'JS') {
+        // JavaScript date format
+        return val.toString();
+    } else {
+        throw new Error(key + "contained unknown_date_format");
+    }
+};
+
 EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) {
     for (var key in parentObjectNode) {
         if (parentObjectNode.hasOwnProperty(key)) {
@@ -156,13 +180,17 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
             var child = parentObjectNode[key];
             var el = null;
 
+            if (child instanceof Date){
+                child = this.convertDate(child, key)
+            }
+
             if (this.config.elementPrefix){
                 // if key starts with elementPrefix remove the prefix (handle it as an element), if only one symbol, treat it as an empty attribute
                 if (key[0] === this.config.elementPrefix) {
                     key =  key.length > 1 ? key.substring(1) : this.config.attributePrefix;
 
                 // otherwise handle it as an attribute
-                } else if (typeof child !== 'object' || child instanceof Date) {
+                } else if (typeof child !== 'object') {
                     key = this.config.attributePrefix + key;
                 }
             }
@@ -199,7 +227,7 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
                     }
                 }
             } else if (this.isAttribute(key)) {
-                if (typeof child === 'string' || typeof child === 'number') {
+                if (typeof child !== 'object') {
                     if (key === this.config.attributePrefix) {
                         parentXmlNode.text = child;
                     } else {
@@ -207,27 +235,6 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
                     }
                 } else {
                     throw new Error(key + "contained non_string_attribute");
-                }
-            } else if (child instanceof Date) {
-                // Date
-                if (this.config.dateFormat === 'ISO') {
-                    // ISO: YYYY-MM-DDTHH:MM:SS.mmmZ
-                    el.text = child.toISOString();
-                } else if (this.config.dateFormat === 'SQL') {
-                    // SQL: YYYY-MM-DD HH:MM:SS
-                    var yyyy    = child.getFullYear();
-                    var mm      = EasyXml.zeroPadTen(child.getMonth() + 1);
-                    var dd      = EasyXml.zeroPadTen(child.getDate());
-                    var hh      = EasyXml.zeroPadTen(child.getHours());
-                    var min     = EasyXml.zeroPadTen(child.getMinutes());
-                    var ss      = EasyXml.zeroPadTen(child.getSeconds());
-
-                    el.text = [yyyy, '-', mm, '-', dd, ' ', hh, ':', min, ':', ss].join("");
-                } else if (this.config.dateFormat === 'JS') {
-                    // JavaScript date format
-                    el.text = child.toString();
-                } else {
-                    throw new Error(key + "contained unknown_date_format");
                 }
             } else if (child instanceof Array) {
                 // Array
