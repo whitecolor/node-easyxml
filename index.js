@@ -161,7 +161,8 @@ EasyXml.prototype.parseChildElement = function(parentXmlNode, parentObjectNode) 
             }
 
             if (this.config.decamelize || this.config.decamelizeAttributes || this.config.decamelizeElements){
-                key = decamelize(key, (this.isAttribute(key) ? this.config.decamelizeAttributes : this.config.decamelizeElements) || this.config.decamelize)
+                var separator = (this.isAttribute(key) ? this.config.decamelizeAttributes : this.config.decamelizeElements) || this.config.decamelize;
+                key = decamelize(key, typeof separator == 'string' ? separator : '-')
             }
 
             if (!isNaN(key)) {
